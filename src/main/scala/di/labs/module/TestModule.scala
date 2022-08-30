@@ -4,6 +4,7 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import di.labs.repository.{JDBCClient, JDBCClientImpl, UserRepository, UserRepositoryImpl}
 import di.labs.service.{UserService, UserServiceImpl}
+import di.labs.util.ZConfig
 object TestModule extends TwitterModule {
   override def configure(): Unit = {
     bind[UserService].to[UserServiceImpl]
@@ -11,9 +12,10 @@ object TestModule extends TwitterModule {
   }
 
   @Provides
-  def providesJDBC():JDBCClient = {
-    new  JDBCClientImpl(url = "jdbc:mysql://localhost:3306/loanrecord", username = "root", pass = "di@2020!")
-
+  def providesJDBC(): JDBCClient = {
+    new JDBCClientImpl(url = ZConfig.getString("database.mysql.url"),
+      username = ZConfig.getString("database.mysql.username"),
+      pass = ZConfig.getString("database.mysql.password"))
   }
 }
 

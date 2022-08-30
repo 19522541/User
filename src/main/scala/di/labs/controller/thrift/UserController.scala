@@ -10,14 +10,15 @@ import javax.inject.{Inject, Singleton}
 class UserController @Inject()(userService: UserService) extends Controller(TUser) {
 
   handle(TUser.GetUserById) { require: TUser.GetUserById.Args => {
-    userService.getUserById(require.id)
+    val response =userService.getUserById(require.id)
+    println(s"UserController::handTUser.GetUserById::response${response}")
+    response
     }
   }
   handle(TUser.AddUser) { require: TUser.AddUser.Args => {
     val detail: InfoTemplate = InfoTemplate(name = require.userInfo.username,
       dob = require.userInfo.dob, sex = require.userInfo.sex, age = require.userInfo.age)
-    userService.addUser(detail)
-
+      userService.addUser(detail)
   }
   }
   handle(TUser.GetUserByName) { require: TUser.GetUserByName.Args => {

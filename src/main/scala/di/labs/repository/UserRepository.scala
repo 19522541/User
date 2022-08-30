@@ -53,7 +53,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       val prepareStatement = mySqlConn.prepareStatement(query)
       prepareStatement.setString(1, id)
       val resultSet: ResultSet = prepareStatement.executeQuery()
-      if (!resultSet.next()) throw NotFoundException("Can not find your user")
+      if (!resultSet.isBeforeFirst) throw NotFoundException("Can not find your user")
       getDetail(resultSet).head
     } catch {
       case e: NotFoundException => throw e
@@ -71,7 +71,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       val prepareStatement = mySqlConn.prepareStatement(query)
       prepareStatement.setString(1, s"%${name}%")
       val resultSet: ResultSet = prepareStatement.executeQuery()
-      if (!resultSet.next()) {
+      if (!resultSet.isBeforeFirst) {
         throw NotFoundException("Can not find your user")
       } else {
         getDetail(resultSet)

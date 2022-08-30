@@ -26,12 +26,12 @@ class UserControllerTest extends FeatureTest {
   test("Thrith Get Exist User By Name Controller") {
     val response = await(client.getUserByName("Ng Van A"))
     assert(response.length == 1)
-  }
-  test("Thrith Get Not Exist User By Name"){
-    val response = await(client.getUserByName("Ng Van O"))
-
-  }
-  test("Thrith Get Not Exist User By Id") {
-    val response = await(client.getUserById("MEIQ213"))
-  }
+   }
+//  test("Thrith Get Not Exist User By Name"){
+//    val response = await(client.getUserByName("Ng Van O"))
+//
+//  }
+//  test("Thrith Get Not Exist User By Id") {
+//    val response = await(client.getUserById("MEIQ213"))
+//  }
 }
