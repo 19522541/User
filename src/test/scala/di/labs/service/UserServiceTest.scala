@@ -2,7 +2,7 @@ package di.labs.service
 
 import com.google.inject.Guice
 import com.twitter.inject.{Injector, IntegrationTest}
-import di.labs.domain.InfoTemplate
+import di.labs.domain.request.AddUserRequest
 import di.labs.module.{MainModule, TestModule}
 import di.labs.util.Implicits.FutureEnhance
 
@@ -16,14 +16,19 @@ class UserServiceTest extends IntegrationTest{
     assert(userInfo.age==21)
   }
   test("add User successfull"){
-    val  userInfo= service.addUser(userInfo = InfoTemplate(
-      name= "NGuye Van Q",
-      age = 21,
-      sex = "male",
-      dob = "2001-03-11"
+    val name= "NGuye Van zzZzz"
+    val age= 21
+    val sex= "MaleMale"
+    val dob= "1998-01-11"
+    val  userInfo= service.addUser(userInfo = AddUserRequest(
+      name= name,
+      age = age,
+      sex = sex,
+      dob = dob
     )).sync()
     assert(userInfo.age==21)
+    assert(userInfo.sex.equals(sex))
+    assert(userInfo.dob==dob)
+    assert(userInfo.username.equals(name))
   }
-
-
 }

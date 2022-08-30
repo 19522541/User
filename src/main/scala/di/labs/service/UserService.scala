@@ -1,7 +1,7 @@
 package di.labs.service
 
 import com.twitter.util.Future
-import di.labs.domain.InfoTemplate
+import di.labs.domain.request.AddUserRequest
 import di.labs.domain.thrift.TUserDetail
 import di.labs.repository.UserRepository
 
@@ -26,7 +26,7 @@ trait UserService {
    * @param userInfo Thông tin của user
    * @return Thông tin nguời dùng vừa mới thêm
    */
-  def addUser(userInfo: InfoTemplate): Future[TUserDetail]
+  def addUser(userInfo: AddUserRequest): Future[TUserDetail]
 }
 
 class UserServiceImpl @Inject()(userRepository: UserRepository) extends UserService {
@@ -37,7 +37,7 @@ class UserServiceImpl @Inject()(userRepository: UserRepository) extends UserServ
   override def getUserByName(name: String): Future[Seq[TUserDetail]] = {
     userRepository.getUsersByName(name)
   }
-  override def addUser(userInfo: InfoTemplate): Future[TUserDetail] = {
+  override def addUser(userInfo: AddUserRequest): Future[TUserDetail] = {
     userRepository.addUser(userInfo)
   }
 

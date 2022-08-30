@@ -2,7 +2,7 @@ package di.labs.repository
 
 import com.twitter.finatra.http.exceptions.NotFoundException
 import com.twitter.util.Future
-import di.labs.domain.InfoTemplate
+import di.labs.domain.request.AddUserRequest
 import di.labs.domain.thrift.TUserDetail
 
 import java.sql.{Connection, ResultSet, SQLException}
@@ -30,7 +30,7 @@ trait UserRepository {
    * @param userInfo Các thông tin người
    * @return thông tin user vừa thêm vào
    */
-  def addUser(userInfo: InfoTemplate): Future[TUserDetail]
+  def addUser(userInfo: AddUserRequest): Future[TUserDetail]
 }
 
 class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepository {
@@ -82,7 +82,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       case e: Exception => throw new InternalError
     }
   }
-  override def addUser(userInfo: InfoTemplate): Future[TUserDetail] = Future{
+  override def addUser(userInfo: AddUserRequest): Future[TUserDetail] = Future{
     val mySqlConn: Connection = JDBCClient.getConnection()
     val query = s"insert into user(id, name, sex, age, dob) values(?, ?, ?, ?, ?)"
     val prepareStatement = mySqlConn.prepareStatement(query)
