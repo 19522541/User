@@ -34,7 +34,7 @@ trait UserRepository {
 }
 
 class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepository {
-  def getDetail (resultSet: ResultSet):Seq[TUserDetail]={
+  def getDetail (resultSet: ResultSet,connection: Connection=null):Seq[TUserDetail]={
     var users:Seq[TUserDetail]=Seq[TUserDetail]()
       while (resultSet.next()){
       users= users:+ TUserDetail( id= resultSet.getString("id"),
@@ -44,6 +44,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
             dob = resultSet.getDate("dob").toString
           )
       }
+    if(connection!=null) connection.close()
     users
   }
   override def getUsesById(id: String): Future[TUserDetail] = Future{
@@ -54,7 +55,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       prepareStatement.setString(1, id)
       val resultSet: ResultSet = prepareStatement.executeQuery()
       if (!resultSet.isBeforeFirst) throw NotFoundException("Can not find your user")
-      getDetail(resultSet).head
+      getDetail(resultSet,connection = mySqlConn).head
     } catch {
       case e: NotFoundException => throw e
       case e: SQLException => throw e
@@ -74,7 +75,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       if (!resultSet.isBeforeFirst) {
         throw NotFoundException("Can not find your user")
       } else {
-        getDetail(resultSet)
+        getDetail(resultSet,connection = mySqlConn)
       }
     } catch {
       case e :NotFoundException=> throw e
@@ -94,6 +95,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
     prepareStatement.setString(5,userInfo.dob)
     prepareStatement.execute()
     val resultSet=prepareStatement.getResultSet
+    mySqlConn.close()
     TUserDetail(id =id,username = userInfo.name, age = userInfo.age  ,
       sex = userInfo.sex, dob = userInfo.dob)
   }

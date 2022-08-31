@@ -7,3 +7,9 @@ struct TUserDetail{
     4:string sex
     5:string dob
 }
+
+struct TResult {
+    1: i64 code
+    2: list<TUserDetail> data
+    3: string msg
+}

@@ -10,7 +10,6 @@ class HttpUserController @Inject()(userService: UserService)  extends Controller
   post("/user"){response:AddUserRequest=>{
     userService.addUser(response)
   }
-
   }
 }
 

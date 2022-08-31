@@ -1,6 +1,7 @@
 package di.labs.controller.thrift
 
 import com.twitter.finatra.thrift.Controller
+import com.twitter.util.Await
 import di.labs.domain.request.AddUserRequest
 import di.labs.service.{TUser, UserService}
 
