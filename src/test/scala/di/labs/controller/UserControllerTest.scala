@@ -1,6 +1,7 @@
 package di.labs.controller
 
 import com.twitter.finatra.http.EmbeddedHttpServer
+import com.twitter.finatra.http.exceptions.NotFoundException
 import com.twitter.finatra.thrift.ThriftClient
 import com.twitter.inject.server.FeatureTest
 import di.labs.domain.thrift.TUserDetail
@@ -26,12 +27,15 @@ class UserControllerTest extends FeatureTest {
   test("Thrith Get Exist User By Name Controller") {
     val response = await(client.getUserByName("Ng Van A"))
     assert(response.length == 1)
-  }
-  test("Thrith Get Not Exist User By Name"){
-    val response = await(client.getUserByName("Ng Van O"))
-
-  }
-  test("Thrith Get Not Exist User By Id") {
-    val response = await(client.getUserById("MEIQ213"))
-  }
+   }
+//  test("Thrith Get Not Exist User By Name"){
+//    try{
+//      await(client.getUserByName("Ng Van O"))
+//    } catch {
+//      case e:Exception=> assert(e.isInstanceOf[NotFoundException])
+//    }
+//  }
+//  test("Thrith Get Not Exist User By Id") {
+//    val response = await(client.getUserById("MEIQ213"))
+//  }
 }

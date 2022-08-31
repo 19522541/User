@@ -9,6 +9,9 @@ import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.mapping.{CaseClassExceptionMapping, CommonExceptionMapping, JsonParseExceptionMapping}
 import com.twitter.finatra.thrift.ThriftServer
 import com.twitter.finatra.thrift.routing.ThriftRouter
+import di.labs.controller.http.HealthController
+import di.labs.controller.http.HttpUserController
+
 import di.labs.controller.thrift.UserController
 import di.labs.module.{MainModule, TestModule}
 import di.labs.util.ZConfig
@@ -52,8 +55,8 @@ class Server extends HttpServer with ThriftServer {
     router
       .filter[CORSFilter](beforeRouting = true)
       .filter[CommonFilters]
-
-
+      .add[HealthController]
+      .add[HttpUserController]
       .exceptionMapper[CaseClassExceptionMapping]
       .exceptionMapper[JsonParseExceptionMapping]
       .exceptionMapper[CommonExceptionMapping]

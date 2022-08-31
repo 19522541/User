@@ -2,7 +2,7 @@ package di.labs.repository
 
 import com.twitter.finatra.http.exceptions.NotFoundException
 import com.twitter.util.Future
-import di.labs.domain.InfoTemplate
+import di.labs.domain.request.AddUserRequest
 import di.labs.domain.thrift.TUserDetail
 
 import java.sql.{Connection, ResultSet, SQLException}
@@ -30,11 +30,11 @@ trait UserRepository {
    * @param userInfo Các thông tin người
    * @return thông tin user vừa thêm vào
    */
-  def addUser(userInfo: InfoTemplate): Future[TUserDetail]
+  def addUser(userInfo: AddUserRequest): Future[TUserDetail]
 }
 
 class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepository {
-  def getDetail (resultSet: ResultSet):Seq[TUserDetail]={
+  def getDetail (resultSet: ResultSet,connection: Connection=null):Seq[TUserDetail]={
     var users:Seq[TUserDetail]=Seq[TUserDetail]()
       while (resultSet.next()){
       users= users:+ TUserDetail( id= resultSet.getString("id"),
@@ -44,6 +44,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
             dob = resultSet.getDate("dob").toString
           )
       }
+    if(connection!=null) connection.close()
     users
   }
   override def getUsesById(id: String): Future[TUserDetail] = Future{
@@ -53,8 +54,8 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       val prepareStatement = mySqlConn.prepareStatement(query)
       prepareStatement.setString(1, id)
       val resultSet: ResultSet = prepareStatement.executeQuery()
-      if (!resultSet.next()) throw NotFoundException("Can not find your user")
-      getDetail(resultSet).head
+      if (!resultSet.isBeforeFirst) throw NotFoundException("Can not find your user")
+      getDetail(resultSet,connection = mySqlConn).head
     } catch {
       case e: NotFoundException => throw e
       case e: SQLException => throw e
@@ -71,10 +72,10 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       val prepareStatement = mySqlConn.prepareStatement(query)
       prepareStatement.setString(1, s"%${name}%")
       val resultSet: ResultSet = prepareStatement.executeQuery()
-      if (!resultSet.next()) {
+      if (!resultSet.isBeforeFirst) {
         throw NotFoundException("Can not find your user")
       } else {
-        getDetail(resultSet)
+        getDetail(resultSet,connection = mySqlConn)
       }
     } catch {
       case e :NotFoundException=> throw e
@@ -82,7 +83,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
       case e: Exception => throw new InternalError
     }
   }
-  override def addUser(userInfo: InfoTemplate): Future[TUserDetail] = Future{
+  override def addUser(userInfo: AddUserRequest): Future[TUserDetail] = Future{
     val mySqlConn: Connection = JDBCClient.getConnection()
     val query = s"insert into user(id, name, sex, age, dob) values(?, ?, ?, ?, ?)"
     val prepareStatement = mySqlConn.prepareStatement(query)
@@ -94,6 +95,7 @@ class UserRepositoryImpl @Inject()(JDBCClient: JDBCClient) extends UserRepositor
     prepareStatement.setString(5,userInfo.dob)
     prepareStatement.execute()
     val resultSet=prepareStatement.getResultSet
+    mySqlConn.close()
     TUserDetail(id =id,username = userInfo.name, age = userInfo.age  ,
       sex = userInfo.sex, dob = userInfo.dob)
   }
